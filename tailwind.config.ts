@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -68,6 +69,10 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			fontFamily: {
+				'orbitron': ['Orbitron', 'monospace'],
+				'space': ['Space Mono', 'monospace'],
+			},
 			keyframes: {
 				'accordion-down': {
 					from: {
@@ -84,11 +89,56 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'loader-fill': {
+					'0%': { width: '0%' },
+					'100%': { width: '100%' }
+				},
+				'loader-dot': {
+					'0%': { left: '0%' },
+					'100%': { left: '100%' }
+				},
+				'laser-scan': {
+					'0%': { top: '0%', opacity: '1' },
+					'100%': { top: '100%', opacity: '0.8' }
+				},
+				'red-haze': {
+					'0%': { height: '0%', opacity: '0' },
+					'100%': { height: '100%', opacity: '0.3' }
+				},
+				'glitch': {
+					'0%': { transform: 'translate(0)' },
+					'20%': { transform: 'translate(-2px, 2px)' },
+					'40%': { transform: 'translate(-2px, -2px)' },
+					'60%': { transform: 'translate(2px, 2px)' },
+					'80%': { transform: 'translate(2px, -2px)' },
+					'100%': { transform: 'translate(0)' }
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'scale(0.9)' },
+					'100%': { opacity: '1', transform: 'scale(1)' }
+				},
+				'fade-out': {
+					'0%': { opacity: '1' },
+					'100%': { opacity: '0' }
+				},
+				'glow-pulse': {
+					'0%': { boxShadow: '0 0 10px #dc2626' },
+					'50%': { boxShadow: '0 0 30px #dc2626, 0 0 40px #dc2626' },
+					'100%': { boxShadow: '0 0 10px #dc2626' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'loader-fill': 'loader-fill 10s ease-out',
+				'loader-dot': 'loader-dot 10s ease-out',
+				'laser-scan': 'laser-scan 3s ease-in-out',
+				'red-haze': 'red-haze 3s ease-out 0.5s',
+				'glitch': 'glitch 0.3s ease-in-out',
+				'fade-in': 'fade-in 1s ease-out',
+				'fade-out': 'fade-out 1s ease-out',
+				'glow-pulse': 'glow-pulse 2s ease-in-out infinite'
 			}
 		}
 	},
