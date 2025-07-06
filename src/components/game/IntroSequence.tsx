@@ -6,10 +6,11 @@ interface IntroSequenceProps {
 }
 
 const IntroSequence = ({ onComplete }: IntroSequenceProps) => {
-  const [phase, setPhase] = useState<'loader' | 'enter' | 'laser' | 'welcome'>('loader');
+  const [phase, setPhase] = useState<'loader' | 'enter' | 'laser' | 'blackout' | 'welcome'>('loader');
   const [progress, setProgress] = useState(0);
-  const [showLaser, setShowLaser] = useState(false);
-  const [laserExpand, setLaserExpand] = useState(false);
+  const [showLasers, setShowLasers] = useState(false);
+  const [showBlackout, setShowBlackout] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   // Loader phase (0-5s)
   useEffect(() => {
@@ -31,41 +32,59 @@ const IntroSequence = ({ onComplete }: IntroSequenceProps) => {
 
   const handleEnterClick = () => {
     setPhase('laser');
-    setShowLaser(true);
     
-    // Play synth sound (simulated with Web Audio API)
+    // Play cinematic laser burst sound with dark techno background
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
       
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+      // Background dark techno/synth soundtrack
+      const bgOscillator = audioContext.createOscillator();
+      const bgGain = audioContext.createGain();
+      bgOscillator.connect(bgGain);
+      bgGain.connect(audioContext.destination);
+      bgOscillator.frequency.setValueAtTime(55, audioContext.currentTime);
+      bgOscillator.type = 'sawtooth';
+      bgGain.gain.setValueAtTime(0.1, audioContext.currentTime);
+      bgOscillator.start();
       
-      oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 2);
-      oscillator.type = 'sawtooth';
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+      // Fiery laser burst sound
+      const laserOscillator = audioContext.createOscillator();
+      const laserGain = audioContext.createGain();
+      laserOscillator.connect(laserGain);
+      laserGain.connect(audioContext.destination);
+      laserOscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+      laserOscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 1);
+      laserOscillator.type = 'square';
+      laserGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+      laserGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+      laserOscillator.start();
+      laserOscillator.stop(audioContext.currentTime + 1);
       
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 2);
     } catch (error) {
       console.log('Audio context not available');
     }
 
     // Laser sequence
     setTimeout(() => {
-      setLaserExpand(true);
-    }, 1000);
+      setShowLasers(true);
+    }, 200);
 
+    // Blackout after laser overwhelm
     setTimeout(() => {
+      setShowBlackout(true);
+      setPhase('blackout');
+    }, 2000);
+
+    // Welcome message after blackout
+    setTimeout(() => {
+      setShowWelcome(true);
       setPhase('welcome');
     }, 3000);
 
+    // Complete sequence
     setTimeout(() => {
       onComplete();
-    }, 8000);
+    }, 13000);
   };
 
   return (
@@ -129,34 +148,63 @@ const IntroSequence = ({ onComplete }: IntroSequenceProps) => {
         </div>
       )}
 
-      {/* Laser Phase */}
+      {/* Laser Phase - Fiery vertical beam and raining lasers */}
       {phase === 'laser' && (
         <>
-          {/* Vertical laser beam */}
-          <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-2 bg-gradient-to-b from-red-500 to-transparent transition-all duration-1000 ${showLaser ? 'h-full' : 'h-0'}`}>
-            <div className="absolute inset-0 bg-red-500 blur-sm opacity-70" />
-            <div className="absolute inset-0 bg-white blur-xs opacity-50" />
+          {/* Primary fiery vertical laser beam piercing the button */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-full bg-gradient-to-b from-red-500 via-orange-400 to-red-600 animate-pulse z-30">
+            <div className="absolute inset-0 bg-red-500 blur-lg opacity-80" />
+            <div className="absolute inset-0 bg-white blur-sm opacity-60" />
+            <div className="absolute inset-0 bg-orange-300 blur-xs opacity-40" />
           </div>
 
-          {/* Expanding circular effect */}
-          <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-900 transition-all duration-2000 ${laserExpand ? 'w-screen h-screen scale-150' : 'w-4 h-4'} opacity-80`} />
+          {/* Dozens of raining laser beams */}
+          {showLasers && [...Array(24)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 bg-gradient-to-b from-red-500 via-orange-400 to-transparent opacity-80"
+              style={{
+                left: `${Math.random() * 100}%`,
+                height: '100%',
+                animation: `laser-rain ${0.8 + Math.random() * 0.6}s ease-in infinite`,
+                animationDelay: `${Math.random() * 1.5}s`
+              }}
+            >
+              <div className="absolute inset-0 bg-red-500 blur-md opacity-70" />
+              <div className="absolute inset-0 bg-white blur-sm opacity-50" />
+              
+              {/* Spark particles on impact */}
+              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
+                <div className="w-4 h-4 bg-orange-400 rounded-full animate-ping opacity-75" />
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse opacity-90" />
+              </div>
+            </div>
+          ))}
 
-          {/* Glitch overlay */}
-          <div className="absolute inset-0 bg-red-500 opacity-10 animate-glitch" />
+          {/* Light flare overlay */}
+          <div className="absolute inset-0 bg-gradient-radial from-red-400 via-transparent to-transparent opacity-30 animate-pulse z-20" />
+          
+          {/* Overwhelming light effect */}
+          <div className="absolute inset-0 bg-white opacity-20 animate-pulse z-25" />
         </>
       )}
 
-      {/* Welcome Message Phase */}
-      {phase === 'welcome' && (
-        <div className="text-center z-10 px-8 max-w-4xl animate-fade-in">
-          <div className="space-y-8">
-            <p className="text-2xl md:text-3xl font-orbitron text-white leading-relaxed">
+      {/* Blackout Phase */}
+      {showBlackout && (
+        <div className="absolute inset-0 bg-black z-40 animate-fade-in" />
+      )}
+
+      {/* Glitched Welcome Message Phase */}
+      {showWelcome && (
+        <div className="absolute inset-0 flex items-center justify-center z-50 animate-fade-in">
+          <div className="text-center px-8 max-w-4xl space-y-8">
+            <p className="text-2xl md:text-3xl font-orbitron text-white leading-relaxed animate-glitch">
               "You've crossed the line that separates choice from consequence."
             </p>
-            <p className="text-2xl md:text-3xl font-orbitron text-red-400 leading-relaxed">
+            <p className="text-2xl md:text-3xl font-orbitron text-red-400 leading-relaxed animate-glitch" style={{ animationDelay: '0.5s' }}>
               "Every move you make is already being judged."
             </p>
-            <p className="text-2xl md:text-3xl font-orbitron text-white leading-relaxed">
+            <p className="text-2xl md:text-3xl font-orbitron text-white leading-relaxed animate-glitch" style={{ animationDelay: '1s' }}>
               "Welcome to Borderland — where survival is just another illusion."
             </p>
           </div>
