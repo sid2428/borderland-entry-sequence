@@ -1,8 +1,8 @@
 
-import BorderlandIntro from "@/components/BorderlandIntro";
+import GameController from "@/components/GameController";
 
 const Index = () => {
-  return <BorderlandIntro />;
+  return <GameController />;
 };
 
 export default Index;
