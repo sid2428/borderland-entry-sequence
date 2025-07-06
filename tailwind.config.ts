@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -125,15 +126,6 @@ export default {
 					'0%': { boxShadow: '0 0 10px #dc2626' },
 					'50%': { boxShadow: '0 0 30px #dc2626, 0 0 40px #dc2626' },
 					'100%': { boxShadow: '0 0 10px #dc2626' }
-				},
-				'float': {
-					'0%, 100%': { transform: 'translateY(0px)' },
-					'50%': { transform: 'translateY(-10px)' }
-				},
-				'neon-pulse': {
-					'0%': { boxShadow: '0 0 20px rgba(255,20,147,0.3)' },
-					'50%': { boxShadow: '0 0 40px rgba(255,20,147,0.8), 0 0 60px rgba(255,20,147,0.4)' },
-					'100%': { boxShadow: '0 0 20px rgba(255,20,147,0.3)' }
 				}
 			},
 			animation: {
@@ -146,9 +138,7 @@ export default {
 				'glitch': 'glitch 0.3s ease-in-out',
 				'fade-in': 'fade-in 1s ease-out',
 				'fade-out': 'fade-out 1s ease-out',
-				'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
-				'float': 'float 6s ease-in-out infinite',
-				'neon-pulse': 'neon-pulse 2s ease-in-out infinite'
+				'glow-pulse': 'glow-pulse 2s ease-in-out infinite'
 			}
 		}
 	},
