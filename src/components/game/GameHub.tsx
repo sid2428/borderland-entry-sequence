@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from 'react';
-import { spade, diamond, heart, club } from 'lucide-react';
 import { Suit } from '../GameController';
 
 interface GameHubProps {
