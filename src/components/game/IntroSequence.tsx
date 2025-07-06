@@ -8,7 +8,7 @@ interface IntroSequenceProps {
 const IntroSequence = ({ onComplete }: IntroSequenceProps) => {
   const [phase, setPhase] = useState<'loader' | 'enter' | 'laser' | 'blackout' | 'welcome'>('loader');
   const [progress, setProgress] = useState(0);
-  const [showLasers, setShowLasers] = useState(false);
+  const [laserBeams, setLaserBeams] = useState<number[]>([]);
   const [showBlackout, setShowBlackout] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
 
@@ -33,58 +33,70 @@ const IntroSequence = ({ onComplete }: IntroSequenceProps) => {
   const handleEnterClick = () => {
     setPhase('laser');
     
-    // Play cinematic laser burst sound with dark techno background
+    // Play subtle ambient psychological-thriller BGM
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       
-      // Background dark techno/synth soundtrack
-      const bgOscillator = audioContext.createOscillator();
-      const bgGain = audioContext.createGain();
-      bgOscillator.connect(bgGain);
-      bgGain.connect(audioContext.destination);
-      bgOscillator.frequency.setValueAtTime(55, audioContext.currentTime);
-      bgOscillator.type = 'sawtooth';
-      bgGain.gain.setValueAtTime(0.1, audioContext.currentTime);
-      bgOscillator.start();
+      // Ambient background pad
+      const padOscillator = audioContext.createOscillator();
+      const padGain = audioContext.createGain();
+      padOscillator.connect(padGain);
+      padGain.connect(audioContext.destination);
+      padOscillator.frequency.setValueAtTime(65, audioContext.currentTime); // Low C
+      padOscillator.type = 'sine';
+      padGain.gain.setValueAtTime(0.03, audioContext.currentTime);
+      padOscillator.start();
       
-      // Fiery laser burst sound
-      const laserOscillator = audioContext.createOscillator();
-      const laserGain = audioContext.createGain();
-      laserOscillator.connect(laserGain);
-      laserGain.connect(audioContext.destination);
-      laserOscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
-      laserOscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 1);
-      laserOscillator.type = 'square';
-      laserGain.gain.setValueAtTime(0.3, audioContext.currentTime);
-      laserGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-      laserOscillator.start();
-      laserOscillator.stop(audioContext.currentTime + 1);
+      // Heartbeat-like pulse
+      const pulseOscillator = audioContext.createOscillator();
+      const pulseGain = audioContext.createGain();
+      pulseOscillator.connect(pulseGain);
+      pulseGain.connect(audioContext.destination);
+      pulseOscillator.frequency.setValueAtTime(80, audioContext.currentTime);
+      pulseOscillator.type = 'triangle';
+      pulseGain.gain.setValueAtTime(0.02, audioContext.currentTime);
+      pulseOscillator.start();
+      
+      // Subtle tension synth
+      const synthOscillator = audioContext.createOscillator();
+      const synthGain = audioContext.createGain();
+      synthOscillator.connect(synthGain);
+      synthGain.connect(audioContext.destination);
+      synthOscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+      synthOscillator.type = 'sawtooth';
+      synthGain.gain.setValueAtTime(0.01, audioContext.currentTime);
+      synthOscillator.start();
       
     } catch (error) {
       console.log('Audio context not available');
     }
 
-    // Laser sequence
-    setTimeout(() => {
-      setShowLasers(true);
-    }, 200);
+    // Timed laser sequence - one beam every 0.1s for 5 seconds total
+    const totalBeams = 24;
+    const beamInterval = 5000 / totalBeams; // 5 seconds divided by total beams
+    
+    for (let i = 0; i < totalBeams; i++) {
+      setTimeout(() => {
+        setLaserBeams(prev => [...prev, i]);
+      }, i * beamInterval);
+    }
 
-    // Blackout after laser overwhelm
+    // Blackout after laser sequence (5s)
     setTimeout(() => {
       setShowBlackout(true);
       setPhase('blackout');
-    }, 2000);
+    }, 5000);
 
-    // Welcome message after blackout
+    // Welcome message after blackout (immediately after blackout)
     setTimeout(() => {
       setShowWelcome(true);
       setPhase('welcome');
-    }, 3000);
+    }, 5200);
 
-    // Complete sequence
+    // Complete sequence after 5 seconds of welcome message
     setTimeout(() => {
       onComplete();
-    }, 13000);
+    }, 10200); // 5s laser + 5s welcome = 10.2s total
   };
 
   return (
@@ -148,44 +160,26 @@ const IntroSequence = ({ onComplete }: IntroSequenceProps) => {
         </div>
       )}
 
-      {/* Laser Phase - Fiery vertical beam and raining lasers */}
+      {/* Timed Laser Phase - One beam at a time falling */}
       {phase === 'laser' && (
         <>
-          {/* Primary fiery vertical laser beam piercing the button */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-full bg-gradient-to-b from-red-500 via-orange-400 to-red-600 animate-pulse z-30">
-            <div className="absolute inset-0 bg-red-500 blur-lg opacity-80" />
-            <div className="absolute inset-0 bg-white blur-sm opacity-60" />
-            <div className="absolute inset-0 bg-orange-300 blur-xs opacity-40" />
-          </div>
-
-          {/* Dozens of raining laser beams */}
-          {showLasers && [...Array(24)].map((_, i) => (
+          {laserBeams.map((beamIndex) => (
             <div
-              key={i}
+              key={beamIndex}
               className="absolute w-2 bg-gradient-to-b from-red-500 via-orange-400 to-transparent opacity-80"
               style={{
-                left: `${Math.random() * 100}%`,
+                left: `${(beamIndex * 4) + 10}%`,
                 height: '100%',
-                animation: `laser-rain ${0.8 + Math.random() * 0.6}s ease-in infinite`,
-                animationDelay: `${Math.random() * 1.5}s`
+                animation: `laser-rain 1.2s ease-in`,
               }}
             >
               <div className="absolute inset-0 bg-red-500 blur-md opacity-70" />
               <div className="absolute inset-0 bg-white blur-sm opacity-50" />
-              
-              {/* Spark particles on impact */}
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-                <div className="w-4 h-4 bg-orange-400 rounded-full animate-ping opacity-75" />
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse opacity-90" />
-              </div>
             </div>
           ))}
 
           {/* Light flare overlay */}
-          <div className="absolute inset-0 bg-gradient-radial from-red-400 via-transparent to-transparent opacity-30 animate-pulse z-20" />
-          
-          {/* Overwhelming light effect */}
-          <div className="absolute inset-0 bg-white opacity-20 animate-pulse z-25" />
+          <div className="absolute inset-0 bg-gradient-radial from-red-400 via-transparent to-transparent opacity-20 animate-pulse z-20" />
         </>
       )}
 
@@ -194,7 +188,7 @@ const IntroSequence = ({ onComplete }: IntroSequenceProps) => {
         <div className="absolute inset-0 bg-black z-40 animate-fade-in" />
       )}
 
-      {/* Glitched Welcome Message Phase */}
+      {/* Glitched Welcome Message Phase - 5 seconds only */}
       {showWelcome && (
         <div className="absolute inset-0 flex items-center justify-center z-50 animate-fade-in">
           <div className="text-center px-8 max-w-4xl space-y-8">

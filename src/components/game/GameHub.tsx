@@ -56,6 +56,23 @@ const GameHub = ({ onCardSelect }: GameHubProps) => {
     },
   ];
 
+  // Disable scrolling and hide scrollbar when a card is hovered
+  useEffect(() => {
+    if (hoveredCard) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
+    }
+
+    // Cleanup
+    return () => {
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
+    };
+  }, [hoveredCard]);
+
   return (
     <div className="fixed inset-0 bg-black overflow-hidden">
       {/* Animated background laser beams */}
@@ -106,7 +123,8 @@ const GameHub = ({ onCardSelect }: GameHubProps) => {
                 className="relative group cursor-pointer"
                 style={{ 
                   animationDelay: `${index * 0.2}s`,
-                  transformStyle: 'preserve-3d'
+                  transformStyle: 'preserve-3d',
+                  pointerEvents: hoveredCard && hoveredCard !== card.suit ? 'none' : 'auto'
                 }}
                 onMouseEnter={() => setHoveredCard(card.suit)}
                 onMouseLeave={() => setHoveredCard(null)}

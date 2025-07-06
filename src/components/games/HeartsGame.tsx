@@ -31,7 +31,7 @@ const HeartsGame = ({ onComplete }: HeartsGameProps) => {
     "Who would you eliminate if you had to choose?"
   ];
 
-  // Initialize mock multiplayer lobby
+  // Initialize mock multiplayer lobby with 6 players
   useEffect(() => {
     const mockPlayers: Player[] = [
       { id: 'player1', name: 'You', isTraitor: false, isAlive: true, suspicionLevel: 0 },
@@ -39,6 +39,7 @@ const HeartsGame = ({ onComplete }: HeartsGameProps) => {
       { id: 'player3', name: 'Sam', isTraitor: Math.random() > 0.7, isAlive: true, suspicionLevel: Math.random() * 50 },
       { id: 'player4', name: 'Jordan', isTraitor: Math.random() > 0.7, isAlive: true, suspicionLevel: Math.random() * 50 },
       { id: 'player5', name: 'Casey', isTraitor: Math.random() > 0.7, isAlive: true, suspicionLevel: Math.random() * 50 },
+      { id: 'player6', name: 'Riley', isTraitor: Math.random() > 0.7, isAlive: true, suspicionLevel: Math.random() * 50 },
     ];
 
     // Ensure at least one traitor exists (maybe)
@@ -140,7 +141,7 @@ const HeartsGame = ({ onComplete }: HeartsGameProps) => {
         {phase === 'lobby' && (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold">Waiting for Players...</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {players.map((player, index) => (
                 <div 
                   key={player.id} 
@@ -156,7 +157,7 @@ const HeartsGame = ({ onComplete }: HeartsGameProps) => {
               ))}
             </div>
             <p className="text-lg text-yellow-400 animate-pulse">
-              Game starting soon...
+              Game starting soon... ({players.length}/6 players ready)
             </p>
           </div>
         )}
@@ -165,7 +166,7 @@ const HeartsGame = ({ onComplete }: HeartsGameProps) => {
           <div className="space-y-8">
             <div className="mb-6">
               <p className="text-lg font-space">Round {currentQuestion + 1} of {questions.length}</p>
-              <p className="text-sm text-gray-400">Trust: {trustScore}% | Suspicion: {betrayalScore}%</p>
+              <p className="text-sm text-gray-400">Players Alive: {players.filter(p => p.isAlive).length}/6 | Trust: {trustScore}% | Suspicion: {betrayalScore}%</p>
             </div>
 
             <div className="bg-gray-900 border-2 border-pink-500 p-8 rounded-lg">
